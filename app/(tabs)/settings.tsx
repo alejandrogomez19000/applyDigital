@@ -1,9 +1,13 @@
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { AppNotificationStatuses, MOBILE_KEYWORDS_FILTERS } from "@/constants/global";
+import {
+  AppNotificationStatuses,
+  MOBILE_KEYWORDS_FILTERS,
+} from "@/constants/global";
 import { useNotificationSettings } from "@/hooks/useNotificationSettings";
+import { useNotificationStore } from "@/store/notificationStore";
 import CheckBox from "@react-native-community/checkbox";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { ActivityIndicator, StyleSheet, Switch } from "react-native";
 
 export default function SettingsScreen() {
@@ -14,9 +18,10 @@ export default function SettingsScreen() {
     setAppEnabled,
     askPermission,
     openSystemSettings,
-    notificationFilters,
     handleSetNotificationFilters,
   } = useNotificationSettings();
+
+  const { filters } = useNotificationStore();
 
   const renderMobileFilters = useMemo(() => {
     return Object.values(MOBILE_KEYWORDS_FILTERS).map((keyword) => (
@@ -24,17 +29,17 @@ export default function SettingsScreen() {
         <ThemedText style={styles.text}>{keyword}</ThemedText>
         <CheckBox
           disabled={false}
-          value={notificationFilters.some((el) => el === keyword)}
+          value={filters.some((el) => el === keyword)}
           onValueChange={(newValue) => {
             const newFilters = newValue
-              ? [...notificationFilters, keyword]
-              : notificationFilters.filter((el) => el !== keyword);
+              ? [...filters, keyword]
+              : filters.filter((el) => el !== keyword);
             handleSetNotificationFilters(newFilters);
           }}
         />
       </ThemedView>
     ));
-  }, [handleSetNotificationFilters, notificationFilters]);
+  }, [handleSetNotificationFilters, filters]);
 
   const osGranted = osStatus === AppNotificationStatuses.GRANTED;
 
@@ -69,7 +74,9 @@ export default function SettingsScreen() {
         />
       </ThemedView>
       <ThemedView>
-        <ThemedText style={styles.subtitle}>Notifications Preferences</ThemedText>
+        <ThemedText style={styles.subtitle}>
+          Notifications Preferences
+        </ThemedText>
         {renderMobileFilters}
       </ThemedView>
     </ThemedView>

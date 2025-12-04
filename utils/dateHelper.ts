@@ -35,16 +35,14 @@ export const formatRelativeTime = (
     return diffDays === 1 ? "1 day ago" : `${diffDays} days ago`;
   }
 
-  if (diffDays > 7) {
-    return diffDays < 14
-      ? "1 week ago"
-      : `${Math.floor(diffDays / 7)} weeks ago`;
+  if (diffDays < 30) {
+    const weeks = Math.floor(diffDays / 7) || 1; // ensure at least 1 week
+    return weeks === 1 ? "1 week ago" : `${weeks} weeks ago`;
   }
 
-  if (diffDays > 30) {
-    return diffDays < 60
-      ? "1 month ago"
-      : `${Math.floor(diffDays / 30)} months ago`;
+  if (diffDays < 365) {
+    const months = Math.floor(diffDays / 30) || 1;
+    return months === 1 ? "1 month ago" : `${months} months ago`;
   }
 
   return createdDate.toLocaleDateString();

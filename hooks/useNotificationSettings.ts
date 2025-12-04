@@ -4,17 +4,22 @@ import {
   requestNotificationPermission,
 } from "@/api/nofiticationPermission";
 import { AppNotificationStatus } from "@/interfaces/global";
-import { getCachedNotificationFilters, setCachedNotificationFilters } from "@/utils/offlineHelper";
+import { useNotificationStore } from "@/store/notificationStore";
+import {
+  getCachedNotificationFilters,
+  setCachedNotificationFilters,
+} from "@/utils/offlineHelper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useState } from "react";
 
 const STORAGE_KEY = "app_notifications_enabled";
 
 export function useNotificationSettings() {
-  const [osStatus, setOsStatus] = useState<AppNotificationStatus>("undetermined");
+  const [osStatus, setOsStatus] =
+    useState<AppNotificationStatus>("undetermined");
   const [appEnabled, setAppEnabled] = useState<boolean>(true);
   const [loading, setLoading] = useState(true);
-  const [notificationFilters, setNotificationFilters] = useState<string[]>([]);
+  const { setFilters } = useNotificationStore();
 
   useEffect(() => {
     (async () => {
@@ -25,7 +30,7 @@ export function useNotificationSettings() {
         setAppEnabled(status === "granted");
       } finally {
         const filters = await getCachedNotificationFilters();
-        setNotificationFilters(filters);
+        setFilters(filters);
         setLoading(false);
       }
     })();
@@ -38,14 +43,13 @@ export function useNotificationSettings() {
 
   const askPermission = useCallback(async () => {
     const status = await requestNotificationPermission();
-    console.log(status, "status after requesting permission");
     setOsStatus(status);
     return status;
   }, []);
 
   const handleSetNotificationFilters = (filters: string[]) => {
     setCachedNotificationFilters(filters);
-    setNotificationFilters(filters);
+    setFilters(filters);
   };
 
   return {
@@ -56,6 +60,5 @@ export function useNotificationSettings() {
     askPermission,
     openSystemSettings: openSystemNotificationSettings,
     handleSetNotificationFilters,
-    notificationFilters,
   };
 }

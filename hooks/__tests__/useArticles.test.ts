@@ -11,9 +11,6 @@ import NetInfo from "@react-native-community/netinfo";
 import { act, renderHook, waitFor } from "@testing-library/react-native";
 import useGetArticles from "../useArticles";
 
-// ---- Mocks ----
-
-// axios instance (default export)
 jest.mock("@/api/axios", () => ({
   __esModule: true,
   default: {
@@ -21,22 +18,18 @@ jest.mock("@/api/axios", () => ({
   },
 }));
 
-// AsyncStorage
 jest.mock("@react-native-async-storage/async-storage", () => ({
   getItem: jest.fn(),
   setItem: jest.fn(),
   removeItem: jest.fn(),
 }));
 
-// NetInfo
 jest.mock("@react-native-community/netinfo", () => ({
   fetch: jest.fn(),
 }));
 
-// offline helpers
 jest.mock("@/utils/offlineHelper");
 
-// Zustand store
 const mockStoreState = {
   articles: [] as any[],
   favouriteArticles: [] as any[],
@@ -49,12 +42,11 @@ const mockStoreState = {
   setFavouriteArticles: jest.fn(),
 };
 
-// Mock the module
 jest.mock("@/store/articleStore", () => ({
   __esModule: true,
-  useArticleStore: jest.fn(), // 👈 named export
+  useArticleStore: jest.fn(),
 }));
-// ---- Helpers to access mocks ----
+
 const mockedUseArticleStore = useArticleStore as unknown as jest.Mock;
 
 const mockedAxios = axios as unknown as { get: jest.Mock };
@@ -67,8 +59,6 @@ const mockedAddCachedFavouriteArticle = addCachedFavouriteArticle as jest.Mock;
 describe("useGetArticles", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-
-    // reset store state & fns
     mockStoreState.articles = [];
     mockStoreState.favouriteArticles = [];
     mockStoreState.deletedArticles = [];
@@ -78,21 +68,14 @@ describe("useGetArticles", () => {
     mockStoreState.addFavouriteArticle.mockClear();
     mockStoreState.setDeletedArticles.mockClear();
     mockStoreState.setFavouriteArticles.mockClear();
-
     mockedUseArticleStore.mockReturnValue(mockStoreState);
-
-    // clear all other mocks
   });
 
-  // 1) ONLINE fetch - calls axios, filters deleted, updates store & cache
   it("fetches articles from API when online and filters deleted ones", async () => {
-    // NetInfo says: connected
     mockedNetInfo.fetch.mockResolvedValue({ isConnected: true } as any);
 
-    // Deleted article in store
     mockStoreState.deletedArticles = [{ objectID: "2" }];
 
-    // API returns 2 hits, one of them deleted
     mockedAxios.get.mockResolvedValue({
       data: {
         hits: [
@@ -110,16 +93,18 @@ describe("useGetArticles", () => {
       ]);
     });
 
-    expect(mockedAxios.get).toHaveBeenCalledWith("/search_by_date?query=mobile&page=0");
-    expect(mockedUpdateCachedArticles).toHaveBeenCalledWith([{ objectID: "1", title: "First" }]);
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+      "/search_by_date?query=mobile&page=0"
+    );
+    expect(mockedUpdateCachedArticles).toHaveBeenCalledWith([
+      { objectID: "1", title: "First" },
+    ]);
 
-    // hook functions are exposed
     expect(result.current.refreshArticles).toBeInstanceOf(Function);
     expect(result.current.deleteArticle).toBeInstanceOf(Function);
     expect(result.current.addArticleToFavourites).toBeInstanceOf(Function);
   });
 
-  // 2) OFFLINE fetch - reads from AsyncStorage and sets articles
   it("loads cached articles from AsyncStorage when offline", async () => {
     mockedNetInfo.fetch.mockResolvedValue({ isConnected: false } as any);
 
@@ -141,13 +126,10 @@ describe("useGetArticles", () => {
     expect(mockedAxios.get).not.toHaveBeenCalled();
   });
 
-  // 3) deleteArticle handler - moves to deleted, updates cache & calls helper
   it("deleteArticle moves article to deleted and updates cache", async () => {
-    // we don't care about initial effects here
     mockedNetInfo.fetch.mockResolvedValue({ isConnected: true } as any);
     mockedAxios.get.mockResolvedValue({ data: { hits: [] } });
 
-    // Articles currently in store
     mockStoreState.articles = [
       { objectID: "1", title: "To delete" },
       { objectID: "2", title: "Keep" },
@@ -164,14 +146,15 @@ describe("useGetArticles", () => {
       title: "To delete",
     });
     expect(mockStoreState.deleteArticle).toHaveBeenCalledWith("1");
-    expect(mockedUpdateCachedArticles).toHaveBeenCalledWith([{ objectID: "2", title: "Keep" }]);
+    expect(mockedUpdateCachedArticles).toHaveBeenCalledWith([
+      { objectID: "2", title: "Keep" },
+    ]);
     expect(mockedAddCachedDeletedArticle).toHaveBeenCalledWith({
       objectID: "1",
       title: "To delete",
     });
   });
 
-  // 4) addArticleToFavourites - adds only if not already favourite
   it("addArticleToFavourites adds article and caches it if not already favourite", async () => {
     mockedNetInfo.fetch.mockResolvedValue({ isConnected: true } as any);
     mockedAxios.get.mockResolvedValue({ data: { hits: [] } });
@@ -182,7 +165,7 @@ describe("useGetArticles", () => {
     ];
     mockStoreState.favouriteArticles = [];
 
-    const { result } = renderHook(() => useGetArticles({ page: 0 }));
+    const { result, rerender } = renderHook(() => useGetArticles({ page: 0 }));
 
     await act(async () => {
       await result.current.addArticleToFavourites("1");
@@ -197,10 +180,14 @@ describe("useGetArticles", () => {
       title: "Article 1",
     });
 
-    // calling again with the same id should NOT add again
     mockStoreState.addFavouriteArticle.mockClear();
     mockedAddCachedFavouriteArticle.mockClear();
+
     mockStoreState.favouriteArticles = [{ objectID: "1", title: "Article 1" }];
+
+    await act(async () => {
+      rerender(null);
+    });
 
     await act(async () => {
       await result.current.addArticleToFavourites("1");
@@ -210,7 +197,6 @@ describe("useGetArticles", () => {
     expect(mockedAddCachedFavouriteArticle).not.toHaveBeenCalled();
   });
 
-  // 5) getStartingData effect - loads cached deleted/favourite
   it("loads starting cached data for articles, deleted and favourite", async () => {
     mockedNetInfo.fetch.mockResolvedValue({ isConnected: false } as any);
 
@@ -235,8 +221,12 @@ describe("useGetArticles", () => {
 
     await waitFor(() => {
       expect(mockStoreState.setArticles).toHaveBeenCalledWith(cachedArticles);
-      expect(mockStoreState.setDeletedArticles).toHaveBeenCalledWith(cachedDeleted);
-      expect(mockStoreState.setFavouriteArticles).toHaveBeenCalledWith(cachedFavourite);
+      expect(mockStoreState.setDeletedArticles).toHaveBeenCalledWith(
+        cachedDeleted
+      );
+      expect(mockStoreState.setFavouriteArticles).toHaveBeenCalledWith(
+        cachedFavourite
+      );
     });
   });
 });
