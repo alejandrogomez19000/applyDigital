@@ -67,7 +67,7 @@ export default function DeletedArticlesScreen() {
       <Header
         title="Deleted Articles"
         actionCallback={handleRestoreAll}
-        actionIconName="trash.fill"
+        actionButtonText="Restore All"
       />
       <FlatList
         style={{ padding: 16 }}

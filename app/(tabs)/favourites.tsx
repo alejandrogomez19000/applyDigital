@@ -56,7 +56,7 @@ export default function FavouritesArticlesScreen() {
       <Header
         title="Favourite Articles"
         actionCallback={handleRestoreAll}
-        actionIconName="trash.fill"
+        actionButtonText="Remove All"
       />
       <FlatList
         style={{ padding: 16 }}

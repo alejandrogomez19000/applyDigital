@@ -1,28 +1,24 @@
-import { useThemeColor } from "@/hooks/useThemeColor";
 import { Pressable, StyleSheet } from "react-native";
 import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
-import { IconSymbol, IconSymbolName } from "./ui/IconSymbol";
 
 type HeaderProps = {
   title: string;
   actionCallback?: () => void;
-  actionIconName?: IconSymbolName;
+  actionButtonText?: string;
 };
 
-export function Header({ title, actionCallback, actionIconName }: HeaderProps) {
-  const textColor = useThemeColor({}, "text");
-
+export function Header({ title, actionCallback, actionButtonText }: HeaderProps) {
   return (
     <ThemedView style={styles.container}>
       <ThemedText style={styles.title}>{title}</ThemedText>
       <ThemedView style={styles.backPlaceholder} />
-      {actionCallback && actionIconName ? (
+      {actionCallback && actionButtonText ? (
         <Pressable
           style={({ pressed }) => [styles.backBtn, { opacity: pressed ? 0.5 : 1 }]}
           onPress={actionCallback}
         >
-          <IconSymbol name={actionIconName} size={20} color={textColor} />
+          <ThemedText style={styles.buttonText}>{actionButtonText}</ThemedText>
         </Pressable>
       ) : (
         <ThemedView style={styles.backPlaceholder} />
@@ -48,8 +44,16 @@ const styles = StyleSheet.create({
   },
   backBtn: {
     padding: 6,
+    borderWidth: 1,
+    borderRadius: 6,
+    backgroundColor: "#007AFF",
+    borderColor: "#007AFF",
   },
   backPlaceholder: {
     width: 32,
+  },
+  buttonText: {
+    fontSize: 14,
+    color: "#fff",
   },
 });
