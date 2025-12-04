@@ -145,6 +145,14 @@ Everything persists automatically via AsyncStorage.
 
 ---
 
+## ⭐ Features
+
+
+![ScreenRecording2025-12-04at1 19 04PM-ezgif com-optimize](https://github.com/user-attachments/assets/4fc45b17-10c6-480e-80b4-a4deefdcef79)
+![ScreenRecording2025-12-04at1 19 04PM-ezgif com-optimize (1)](https://github.com/user-attachments/assets/f2fc41a0-88b6-4c06-9904-db52faeb7d30)
+
+---
+
 ## 🧪 Testing
 
 ### This repository includes a complete Jest setup with mocks for:
