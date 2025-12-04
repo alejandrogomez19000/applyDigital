@@ -27,9 +27,7 @@ const useGetArticles = ({ page = 0 }: { page?: number }) => {
   const handleDeleteArticle = useCallback(
     async (id: string) => {
       if (articles) {
-        const article = articles.find(
-          (article: any) => article.objectID === id
-        );
+        const article = articles.find((article: any) => article.objectID === id);
 
         if (article) {
           addDeletedArticle(article);
@@ -45,13 +43,9 @@ const useGetArticles = ({ page = 0 }: { page?: number }) => {
   const addArticleToFavourites = useCallback(
     async (id: string) => {
       if (articles) {
-        const article = articles.find(
-          (article: any) => article.objectID === id
-        );
+        const article = articles.find((article: any) => article.objectID === id);
 
-        const checkAlreadyFavourite = favouriteArticles.find(
-          (article) => article.objectID === id
-        );
+        const checkAlreadyFavourite = favouriteArticles.find((article) => article.objectID === id);
 
         if (article && !checkAlreadyFavourite) {
           addFavouriteArticle(article);
@@ -65,9 +59,7 @@ const useGetArticles = ({ page = 0 }: { page?: number }) => {
   const removeDeletedArticles = useCallback(
     (data: IArticle[]) => {
       return data.filter((article: any) => {
-        return !deletedArticles.some(
-          (deleted) => deleted.objectID === article.objectID
-        );
+        return !deletedArticles.some((deleted) => deleted.objectID === article.objectID);
       });
     },
     [deletedArticles]
@@ -81,9 +73,7 @@ const useGetArticles = ({ page = 0 }: { page?: number }) => {
         return cached ? setArticles(JSON.parse(cached)) : [];
       }
 
-      const { data } = await axios.get(
-        `/search_by_date?query=mobile&page=${page}`
-      );
+      const { data } = await axios.get(`/search_by_date?query=mobile&page=${page}`);
 
       const revisedArticles = removeDeletedArticles(data?.hits);
       setArticles(revisedArticles);
@@ -98,7 +88,6 @@ const useGetArticles = ({ page = 0 }: { page?: number }) => {
       getArticles();
       if (callback) {
         callback();
-        console.log("Callback executed after refresh");
       }
     },
     [getArticles]
@@ -106,15 +95,9 @@ const useGetArticles = ({ page = 0 }: { page?: number }) => {
 
   const getStartingData = useCallback(async () => {
     try {
-      const cachedArticles = await AsyncStorage.getItem(
-        StorageKeys.CACHED_ARTICLES
-      );
-      const cachedDeleted = await AsyncStorage.getItem(
-        StorageKeys.CACHED_DELETED_ARTICLES
-      );
-      const cachedFavourite = await AsyncStorage.getItem(
-        StorageKeys.CACHED_FAVOURITE_ARTICLES
-      );
+      const cachedArticles = await AsyncStorage.getItem(StorageKeys.CACHED_ARTICLES);
+      const cachedDeleted = await AsyncStorage.getItem(StorageKeys.CACHED_DELETED_ARTICLES);
+      const cachedFavourite = await AsyncStorage.getItem(StorageKeys.CACHED_FAVOURITE_ARTICLES);
 
       if (cachedArticles) {
         setArticles(JSON.parse(cachedArticles));

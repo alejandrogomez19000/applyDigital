@@ -5,6 +5,7 @@ export enum StorageKeys {
   LAST_SEEN_KEY = "hn_mobile_last_seen_created_at",
   HN_BACKGROUND_TASK = "hn-mobile-background-task",
   NOTIFICATION_FILTERS = "notification_filters",
+  APP_NOTIFICATIONS_ENABLED = "app_notifications_enabled",
 }
 
 export enum AppNotificationStatuses {

@@ -1,9 +1,11 @@
 import { Card } from "@/components/Card";
+import { Header } from "@/components/Header";
+import { ThemedView } from "@/components/ThemedView";
 import useGetArticles from "@/hooks/useArticles";
 import { IArticle } from "@/interfaces/global";
 import { useArticleStore } from "@/store/articleStore";
-import React, { useCallback, useState } from "react";
-import { FlatList, RefreshControl, Text, View } from "react-native";
+import { useCallback, useState } from "react";
+import { FlatList, RefreshControl } from "react-native";
 
 export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
@@ -12,7 +14,6 @@ export default function HomeScreen() {
   const { refreshArticles, deleteArticle, addArticleToFavourites } = useGetArticles({ page: 0 });
 
   const handleDelete = (id: string) => {
-    console.log("Delete article with id:", id);
     deleteArticle(id);
   };
 
@@ -30,10 +31,8 @@ export default function HomeScreen() {
   }, [refreshArticles]);
 
   return (
-    <View style={{ flex: 1 }}>
-      <View>
-        <Text>Articles Count: {articles.length}</Text>
-      </View>
+    <ThemedView style={{ flex: 1 }}>
+      <Header title="Articles" />
       <FlatList
         style={{ padding: 16, flex: 1 }}
         data={articles}
@@ -44,6 +43,6 @@ export default function HomeScreen() {
           paddingBottom: 50,
         }}
       />
-    </View>
+    </ThemedView>
   );
 }

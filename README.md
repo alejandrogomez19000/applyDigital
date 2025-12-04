@@ -170,6 +170,7 @@ npx jest hooks/__tests__/useArticlesPolling.test.ts
 
 ## 📁 Project Structure
 
+```txt
 applyDigital/
 ├── api/               # Axios instance, notification permission helpers
 ├── app/               # expo-router screens and routes
@@ -179,9 +180,8 @@ applyDigital/
 ├── utils/             # helpers (offline cache, time formatting, indexing)
 ├── constants/         # storage keys, enums, config constants
 ├── __tests__/         # Jest test files
-├── App.tsx            # main Expo entry point
 └── package.json
-
+```
 
 ## 🛠 Scripts
 

@@ -38,10 +38,8 @@ export async function showNewArticleNotification({
 TaskManager.defineTask(StorageKeys.HN_BACKGROUND_TASK, async () => {
   try {
     const { data } = await axios.get(`/search_by_date?query=mobile&page=0`);
-    console.log("HN background task: before", data);
 
     if (!data) {
-      console.log("HN background task: fetch failed", data);
       return BackgroundTask.BackgroundTaskResult.Failed;
     }
 
@@ -83,20 +81,16 @@ TaskManager.defineTask(StorageKeys.HN_BACKGROUND_TASK, async () => {
 
 export async function registerHnBackgroundTask() {
   const status = await BackgroundTask.getStatusAsync();
-  console.log(status, "BackgroundTask status");
   if (status !== BackgroundTask.BackgroundTaskStatus.Available) {
-    console.log("BackgroundTask not available, status:", status);
     return;
   }
 
   const isRegistered = await TaskManager.isTaskRegisteredAsync(StorageKeys.HN_BACKGROUND_TASK);
-  console.log(isRegistered, "BackgroundTask isRegistered");
 
   if (!isRegistered) {
     await BackgroundTask.registerTaskAsync(StorageKeys.HN_BACKGROUND_TASK, {
       minimumInterval: 15,
     });
-    console.log("HN background task registered");
   }
 }
 
@@ -104,6 +98,5 @@ export async function unregisterHnBackgroundTask() {
   const isRegistered = await TaskManager.isTaskRegisteredAsync(StorageKeys.HN_BACKGROUND_TASK);
   if (isRegistered) {
     await BackgroundTask.unregisterTaskAsync(StorageKeys.HN_BACKGROUND_TASK);
-    console.log("HN background task unregistered");
   }
 }

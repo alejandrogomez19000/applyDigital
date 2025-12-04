@@ -1,9 +1,6 @@
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import {
-  AppNotificationStatuses,
-  MOBILE_KEYWORDS_FILTERS,
-} from "@/constants/global";
+import { AppNotificationStatuses, MOBILE_KEYWORDS_FILTERS } from "@/constants/global";
 import { useNotificationSettings } from "@/hooks/useNotificationSettings";
 import { useNotificationStore } from "@/store/notificationStore";
 import CheckBox from "@react-native-community/checkbox";
@@ -53,7 +50,7 @@ export default function SettingsScreen() {
   }
 
   return (
-    <ThemedView style={{ padding: 16, gap: 16 }}>
+    <ThemedView style={{ padding: 16, gap: 16, flex: 1 }}>
       <ThemedText style={styles.subtitle}>Permission</ThemedText>
       <ThemedView style={styles.buttonContainer}>
         <ThemedText>Enable notifications in this app</ThemedText>
@@ -74,9 +71,7 @@ export default function SettingsScreen() {
         />
       </ThemedView>
       <ThemedView>
-        <ThemedText style={styles.subtitle}>
-          Notifications Preferences
-        </ThemedText>
+        <ThemedText style={styles.subtitle}>Notifications Preferences</ThemedText>
         {renderMobileFilters}
       </ThemedView>
     </ThemedView>
