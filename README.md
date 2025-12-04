@@ -153,7 +153,8 @@ Everything persists automatically via AsyncStorage.
 
 ### Notifications and articles view
 
-![ScreenRecording2025-12-04at1 19 04PM-ezgif com-optimize (1)](https://github.com/user-attachments/assets/f2fc41a0-88b6-4c06-9904-db52faeb7d30)
+![ScreenRecording2025-12-04at1 19 04PM-ezgif com-video-to-gif-converter (3)](https://github.com/user-attachments/assets/b7737fae-35bc-42ec-86fe-8ea0b3155eb3)
+
 
 ---
 
