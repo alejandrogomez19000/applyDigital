@@ -1,11 +1,7 @@
 import { IArticle } from "@/interfaces/global";
 import { useNavigation } from "expo-router";
 import { Alert, Pressable, StyleSheet, View } from "react-native";
-import {
-  Gesture,
-  GestureDetector,
-  GestureHandlerRootView,
-} from "react-native-gesture-handler";
+import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -26,6 +22,8 @@ type CardProps = {
   onDelete?: (id: string) => void;
   disableDelete?: boolean;
   onToggleFavourite?: (id: string) => void;
+  isFromDeleted?: boolean;
+  isFromFavourite?: boolean;
 };
 
 const DELETE_SWIPE_THRESHOLD = -120;
@@ -37,6 +35,8 @@ export function Card({
   onDelete,
   disableDelete,
   onToggleFavourite,
+  isFromDeleted,
+  isFromFavourite,
 }: CardProps) {
   const { favouriteArticles } = useArticleStore();
 
@@ -51,8 +51,10 @@ export function Card({
   const handleOnDelete = () => {
     if (onDelete) {
       Alert.alert(
-        "Delete Article",
-        "Are you sure you want to delete this article?",
+        isFromDeleted ? "Restore Article" : "Delete Article",
+        isFromDeleted
+          ? "Are you sure you want to restore this article?"
+          : "Are you sure you want to delete this article?",
         [
           {
             text: "Cancel",
@@ -62,7 +64,7 @@ export function Card({
             },
           },
           {
-            text: "Delete",
+            text: isFromDeleted ? "Restore" : "Delete",
             style: "destructive",
             onPress: () => {
               onDelete(article.objectID);
@@ -76,7 +78,27 @@ export function Card({
 
   const handleOnToggleFavourite = () => {
     if (onToggleFavourite) {
-      onToggleFavourite(article.objectID);
+      Alert.alert(
+        "Add to Favourites",
+        "Are you sure you want to add this article to favourites?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+            onPress: () => {
+              translateX.value = withSpring(0);
+            },
+          },
+          {
+            text: "Add",
+            style: "destructive",
+            onPress: () => {
+              onToggleFavourite(article.objectID);
+            },
+          },
+        ],
+        { cancelable: true }
+      );
     }
   };
 
@@ -93,21 +115,21 @@ export function Card({
       if (nextX > MAX_SWIPE) nextX = MAX_SWIPE;
       if (nextX < -MAX_SWIPE) nextX = -MAX_SWIPE;
 
-      if (disableDelete && nextX < 0) {
+      if ((isFromFavourite || isFromDeleted) && nextX > 0) {
         translateX.value = 0;
       } else {
         translateX.value = nextX;
       }
     })
     .onEnd(() => {
-      if (translateX.value < DELETE_SWIPE_THRESHOLD && !disableDelete) {
+      if (translateX.value < DELETE_SWIPE_THRESHOLD) {
         translateX.value = withTiming(-MAX_SWIPE, {}, () => {
           scheduleOnRN(handleOnDelete);
         });
         return;
       }
 
-      if (translateX.value > FAVOURITES_SWIPE_THRESHOLD && onToggleFavourite) {
+      if (translateX.value > FAVOURITES_SWIPE_THRESHOLD && !isFromFavourite && !isFromDeleted) {
         translateX.value = withTiming(MAX_SWIPE, {}, () => {
           scheduleOnRN(handleOnToggleFavourite);
           translateX.value = withSpring(0);
@@ -148,11 +170,7 @@ export function Card({
             <Pressable onPress={handleOnArticlePress}>
               <ThemedView style={styles.card}>
                 <View style={styles.favouriteStar}>
-                  <IconSymbol
-                    size={16}
-                    name="star.fill"
-                    color={isFavourite ? "#FFD93B" : "#ccc"}
-                  />
+                  <IconSymbol size={16} name="star.fill" color={isFavourite ? "#FFD93B" : "#ccc"} />
                 </View>
                 <ThemedText numberOfLines={1} ellipsizeMode="tail">
                   {title}

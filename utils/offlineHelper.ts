@@ -1,99 +1,118 @@
-import { IArticle, StorageKeys } from "@/interfaces/global";
+import { StorageKeys } from "@/constants/global";
+import { IArticle } from "@/interfaces/global";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const getCachedDeletedIds = async (): Promise<string[]> => {
+export const getCachedDeletedArticles = async (): Promise<IArticle[]> => {
   try {
-    const value = await AsyncStorage.getItem(StorageKeys.DELETED_IDS_KEY);
+    const value = await AsyncStorage.getItem(StorageKeys.CACHED_DELETED_ARTICLES);
     if (!value) return [];
     return JSON.parse(value);
   } catch (e) {
-    console.warn("Error reading deleted ids", e);
+    console.warn("Error reading deleted articles", e);
     return [];
   }
 };
 
-export const getCachedFavouriteIds = async (): Promise<string[]> => {
+export const getCachedFavouriteArticles = async (): Promise<IArticle[]> => {
   try {
-    const value = await AsyncStorage.getItem(StorageKeys.FAVOURITE_IDS_KEY);
+    const value = await AsyncStorage.getItem(StorageKeys.CACHED_FAVOURITE_ARTICLES);
     if (!value) return [];
     return JSON.parse(value);
   } catch (e) {
-    console.warn("Error reading deleted ids", e);
+    console.warn("Error reading favourite articles", e);
     return [];
   }
 };
 
-export const addCachedDeletedId = async (id: string): Promise<void> => {
+export const addCachedDeletedArticle = async (article: IArticle): Promise<void> => {
   try {
-    const current = await getCachedDeletedIds();
-    if (current.includes(id)) return;
-    const updated = [...current, id];
-    await AsyncStorage.setItem(
-      StorageKeys.DELETED_IDS_KEY,
-      JSON.stringify(updated)
-    );
+    const current = await getCachedDeletedArticles();
+    if (current.some((item) => item.objectID === article.objectID)) return;
+    const updated = [...current, article];
+    await AsyncStorage.setItem(StorageKeys.CACHED_DELETED_ARTICLES, JSON.stringify(updated));
   } catch (e) {
-    console.warn("Error saving deleted id", e);
+    console.warn("Error saving deleted article", e);
   }
 };
 
-export const removeCachedDeletedId = async (id: string): Promise<void> => {
+export const removeCachedDeletedById = async (id: string): Promise<void> => {
   try {
-    const current = await getCachedDeletedIds();
-    const updated = current.filter((x) => x !== id);
-    await AsyncStorage.setItem(
-      StorageKeys.DELETED_IDS_KEY,
-      JSON.stringify(updated)
-    );
+    const current = await getCachedDeletedArticles();
+    const updated = current.filter((x) => x.objectID !== id);
+    await AsyncStorage.setItem(StorageKeys.CACHED_DELETED_ARTICLES, JSON.stringify(updated));
   } catch (e) {
-    console.warn("Error removing deleted id", e);
+    console.warn("Error removing deleted article", e);
   }
 };
 
-export const clearCachedDeletedIds = async (): Promise<void> => {
+export const clearCachedDeletedArticles = async (): Promise<void> => {
   try {
-    await AsyncStorage.removeItem(StorageKeys.DELETED_IDS_KEY);
+    await AsyncStorage.removeItem(StorageKeys.CACHED_DELETED_ARTICLES);
   } catch (e) {
-    console.warn("Error clearing deleted ids", e);
+    console.warn("Error clearing deleted articles", e);
   }
 };
 
-export const removeCachedFavouriteId = async (id: string): Promise<void> => {
+export const clearCachedFavouriteArticles = async (): Promise<void> => {
   try {
-    const current = await getCachedFavouriteIds();
-    const updated = current.filter((x) => x !== id);
-    await AsyncStorage.setItem(
-      StorageKeys.FAVOURITE_IDS_KEY,
-      JSON.stringify(updated)
-    );
+    await AsyncStorage.removeItem(StorageKeys.CACHED_FAVOURITE_ARTICLES);
   } catch (e) {
-    console.warn("Error removing deleted id", e);
+    console.warn("Error clearing favourite articles", e);
   }
 };
 
-export const addCachedFavouriteId = async (id: string): Promise<void> => {
+export const clearCachedArticles = async (): Promise<void> => {
   try {
-    const current = await getCachedFavouriteIds();
-    if (current.includes(id)) return;
-    const updated = [...current, id];
-    await AsyncStorage.setItem(
-      StorageKeys.FAVOURITE_IDS_KEY,
-      JSON.stringify(updated)
-    );
+    await AsyncStorage.removeItem(StorageKeys.CACHED_ARTICLES);
   } catch (e) {
-    console.warn("Error saving favourite id", e);
+    console.warn("Error clearing articles", e);
   }
 };
 
-export const updateCachedArticles = async (
-  articles: IArticle[]
-): Promise<void> => {
+export const removeCachedFavouriteById = async (id: string): Promise<void> => {
   try {
-    await AsyncStorage.setItem(
-      StorageKeys.ARTICLES_KEY,
-      JSON.stringify(articles)
-    );
+    const current = await getCachedFavouriteArticles();
+    const updated = current.filter((x) => x.objectID !== id);
+    await AsyncStorage.setItem(StorageKeys.CACHED_FAVOURITE_ARTICLES, JSON.stringify(updated));
+  } catch (e) {
+    console.warn("Error removing favourite article", e);
+  }
+};
+
+export const addCachedFavouriteArticle = async (article: IArticle): Promise<void> => {
+  try {
+    const current = await getCachedFavouriteArticles();
+    if (current.some((item) => item.objectID === article.objectID)) return;
+    const updated = [...current, article];
+    await AsyncStorage.setItem(StorageKeys.CACHED_FAVOURITE_ARTICLES, JSON.stringify(updated));
+  } catch (e) {
+    console.warn("Error saving favourite article", e);
+  }
+};
+
+export const updateCachedArticles = async (articles: IArticle[]): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(StorageKeys.CACHED_ARTICLES, JSON.stringify(articles));
   } catch (e) {
     console.warn("Error updating cached articles", e);
+  }
+};
+
+export const setCachedNotificationFilters = async (filters: string[]): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(StorageKeys.NOTIFICATION_FILTERS, JSON.stringify(filters));
+  } catch (error) {
+    console.warn("Error saving notification filters", error);
+  }
+};
+
+export const getCachedNotificationFilters = async (): Promise<string[]> => {
+  try {
+    const value = await AsyncStorage.getItem(StorageKeys.NOTIFICATION_FILTERS);
+    if (!value) return [];
+    return JSON.parse(value);
+  } catch (e) {
+    console.warn("Error reading notification filters", e);
+    return [];
   }
 };

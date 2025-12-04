@@ -11,9 +11,4 @@ export interface IArticle {
   updated_at: string;
   title?: string;
 }
-
-export enum StorageKeys {
-  DELETED_IDS_KEY = "deleted_item_ids",
-  ARTICLES_KEY = "cached_articles",
-  FAVOURITE_IDS_KEY = "favourite_item_ids",
-}
+export type AppNotificationStatus = "granted" | "denied" | "undetermined";

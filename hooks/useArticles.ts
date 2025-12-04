@@ -1,9 +1,10 @@
 import axios from "@/api/axios";
-import { IArticle, StorageKeys } from "@/interfaces/global";
+import { StorageKeys } from "@/constants/global";
+import { IArticle } from "@/interfaces/global";
 import { useArticleStore } from "@/store/articleStore";
 import {
-  addCachedDeletedId,
-  addCachedFavouriteId,
+  addCachedDeletedArticle,
+  addCachedFavouriteArticle,
   updateCachedArticles,
 } from "@/utils/offlineHelper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -14,9 +15,9 @@ const useGetArticles = ({ page = 0 }: { page?: number }) => {
   const {
     articles,
     setArticles,
-    setDeletedArticle,
+    addDeletedArticle,
     deleteArticle,
-    setFavouriteArticle,
+    addFavouriteArticle,
     favouriteArticles,
     setDeletedArticles,
     setFavouriteArticles,
@@ -26,46 +27,39 @@ const useGetArticles = ({ page = 0 }: { page?: number }) => {
   const handleDeleteArticle = useCallback(
     async (id: string) => {
       if (articles) {
-        const article = articles.find(
-          (article: any) => article.objectID === id
-        );
+        const article = articles.find((article: any) => article.objectID === id);
 
         if (article) {
-          setDeletedArticle(article);
+          addDeletedArticle(article);
           deleteArticle(id);
-          await addCachedDeletedId(id);
+          updateCachedArticles(articles.filter((a) => a.objectID !== id));
+          await addCachedDeletedArticle(article);
         }
       }
     },
-    [articles, deleteArticle, setDeletedArticle]
+    [articles, deleteArticle, addDeletedArticle]
   );
 
   const addArticleToFavourites = useCallback(
     async (id: string) => {
       if (articles) {
-        const article = articles.find(
-          (article: any) => article.objectID === id
-        );
+        const article = articles.find((article: any) => article.objectID === id);
 
-        const checkAlreadyFavourite = favouriteArticles.find(
-          (article) => article.objectID === id
-        );
+        const checkAlreadyFavourite = favouriteArticles.find((article) => article.objectID === id);
 
         if (article && !checkAlreadyFavourite) {
-          setFavouriteArticle(article);
-          await addCachedFavouriteId(id);
+          addFavouriteArticle(article);
+          await addCachedFavouriteArticle(article);
         }
       }
     },
-    [articles, favouriteArticles, setFavouriteArticle]
+    [articles, favouriteArticles, addFavouriteArticle]
   );
 
   const removeDeletedArticles = useCallback(
     (data: IArticle[]) => {
       return data.filter((article: any) => {
-        return !deletedArticles.some(
-          (deleted) => deleted.objectID === article.objectID
-        );
+        return !deletedArticles.some((deleted) => deleted.objectID === article.objectID);
       });
     },
     [deletedArticles]
@@ -75,14 +69,12 @@ const useGetArticles = ({ page = 0 }: { page?: number }) => {
     try {
       const { isConnected } = await NetInfo.fetch();
       if (!isConnected) {
-        const cached = await AsyncStorage.getItem(StorageKeys.ARTICLES_KEY);
+        const cached = await AsyncStorage.getItem(StorageKeys.CACHED_ARTICLES);
         return cached ? setArticles(JSON.parse(cached)) : [];
       }
 
-      const { data } = await axios.get(
-        `/search_by_date?query=mobile&page=${page}`
-      );
-
+      const { data } = await axios.get(`/search_by_date?query=mobile&page=${page}`);
+      console.log(data, "data in getArticles refresh");
       const revisedArticles = removeDeletedArticles(data?.hits);
       setArticles(revisedArticles);
       updateCachedArticles(revisedArticles);
@@ -104,45 +96,18 @@ const useGetArticles = ({ page = 0 }: { page?: number }) => {
 
   const getStartingData = useCallback(async () => {
     try {
-      const cachedArticles = await AsyncStorage.getItem(
-        StorageKeys.ARTICLES_KEY
-      );
-      const cachedDeletedIds = await AsyncStorage.getItem(
-        StorageKeys.DELETED_IDS_KEY
-      );
-      const cachedFavouriteIds = await AsyncStorage.getItem(
-        StorageKeys.FAVOURITE_IDS_KEY
-      );
+      const cachedArticles = await AsyncStorage.getItem(StorageKeys.CACHED_ARTICLES);
+      const cachedDeleted = await AsyncStorage.getItem(StorageKeys.CACHED_DELETED_ARTICLES);
+      const cachedFavourite = await AsyncStorage.getItem(StorageKeys.CACHED_FAVOURITE_ARTICLES);
 
       if (cachedArticles) {
-        const retrievedArticles: IArticle[] = JSON.parse(cachedArticles);
-        const deletedArticles: IArticle[] = [];
-        const favouriteArticles: IArticle[] = [];
-
-        retrievedArticles.forEach((article) => {
-          if (
-            cachedDeletedIds &&
-            JSON.parse(cachedDeletedIds).includes(article.objectID)
-          ) {
-            deletedArticles.push(article);
-          }
-
-          if (
-            cachedFavouriteIds &&
-            JSON.parse(cachedFavouriteIds).includes(article.objectID)
-          ) {
-            favouriteArticles.push(article);
-          }
-        });
-
-        setArticles(retrievedArticles);
-        setDeletedArticles(deletedArticles);
-        setFavouriteArticles(favouriteArticles);
-        console.log("Starting data loaded from cache", {
-          retrievedArticles,
-          deletedArticles,
-          favouriteArticles,
-        });
+        setArticles(JSON.parse(cachedArticles));
+      }
+      if (cachedDeleted) {
+        setDeletedArticles(JSON.parse(cachedDeleted));
+      }
+      if (cachedFavourite) {
+        setFavouriteArticles(JSON.parse(cachedFavourite));
       }
     } catch (error) {
       console.error("Error getting starting data:", error);

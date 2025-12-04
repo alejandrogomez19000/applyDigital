@@ -1,31 +1,71 @@
 import { Card } from "@/components/Card";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
 import { IArticle } from "@/interfaces/global";
 import { useArticleStore } from "@/store/articleStore";
-import React, { useEffect } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { clearCachedFavouriteArticles, removeCachedFavouriteById } from "@/utils/offlineHelper";
+import React from "react";
+import { FlatList, Pressable, StyleSheet } from "react-native";
 
 export default function FavouritesArticlesScreen() {
-  const { favouriteArticles } = useArticleStore();
+  const { favouriteArticles, clearFavouriteArticles, setFavouriteArticles } = useArticleStore();
 
-  useEffect(() => {
-    console.log(favouriteArticles, "favouriteArticles");
-  }, [favouriteArticles]);
+  const handleRemoveFromFavourite = (id: string) => {
+    const updatedFavouriteArticles = favouriteArticles.filter((article) => article.objectID !== id);
+    if (updatedFavouriteArticles) {
+      setFavouriteArticles(updatedFavouriteArticles);
+      removeCachedFavouriteById(id);
+    }
+  };
+
+  const handleRestoreAll = () => {
+    clearFavouriteArticles();
+    clearCachedFavouriteArticles();
+  };
 
   const renderItems = ({ item }: { item: IArticle }) => (
-    <Card article={item} disableDelete />
+    <Card
+      article={item}
+      isFromFavourite
+      disableDelete
+      onDelete={() => handleRemoveFromFavourite(item.objectID)}
+    />
   );
-  console.log(favouriteArticles, "favouriteArticles");
 
   return (
-    <View style={{ paddingBottom: 10 }}>
+    <ThemedView style={styles.container}>
+      <ThemedView style={styles.header}>
+        <ThemedText style={styles.text}>Remove all favourites</ThemedText>
+        <Pressable onPress={handleRestoreAll}>
+          <ThemedText style={styles.text}>Remove All</ThemedText>
+        </Pressable>
+      </ThemedView>
       <FlatList
         style={{ padding: 16 }}
         data={favouriteArticles}
         keyExtractor={(item) => item.objectID}
         renderItem={renderItems}
+        contentContainerStyle={{
+          paddingBottom: 50,
+        }}
       />
-    </View>
+    </ThemedView>
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  text: {
+    fontSize: 20,
+    fontWeight: "500",
+    marginBottom: 8,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 16,
+  },
+});

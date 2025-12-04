@@ -3,14 +3,13 @@ import useGetArticles from "@/hooks/useArticles";
 import { IArticle } from "@/interfaces/global";
 import { useArticleStore } from "@/store/articleStore";
 import React, { useCallback, useState } from "react";
-import { FlatList, RefreshControl, View } from "react-native";
+import { FlatList, RefreshControl, Text, View } from "react-native";
 
 export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   const { articles } = useArticleStore();
-  const { refreshArticles, deleteArticle, addArticleToFavourites } =
-    useGetArticles({ page: 1 });
+  const { refreshArticles, deleteArticle, addArticleToFavourites } = useGetArticles({ page: 0 });
 
   const handleDelete = (id: string) => {
     console.log("Delete article with id:", id);
@@ -22,11 +21,7 @@ export default function HomeScreen() {
   };
 
   const renderItems = ({ item }: { item: IArticle }) => (
-    <Card
-      article={item}
-      onDelete={handleDelete}
-      onToggleFavourite={handleToggleFavourite}
-    />
+    <Card article={item} onDelete={handleDelete} onToggleFavourite={handleToggleFavourite} />
   );
 
   const onRefresh = useCallback(() => {
@@ -35,15 +30,19 @@ export default function HomeScreen() {
   }, [refreshArticles]);
 
   return (
-    <View style={{ paddingBottom: 10 }}>
+    <View style={{ flex: 1 }}>
+      <View>
+        <Text>Articles Count: {articles.length}</Text>
+      </View>
       <FlatList
-        style={{ padding: 16 }}
+        style={{ padding: 16, flex: 1 }}
         data={articles}
         keyExtractor={(item) => item.objectID}
         renderItem={renderItems}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        contentContainerStyle={{
+          paddingBottom: 50,
+        }}
       />
     </View>
   );
