@@ -117,7 +117,7 @@ npx expo run:ios
 ```
 ---
 
-## 🔔 Notifications
+## 🔔 Notifications (not working on Expo Go)
 
 - This project uses expo-notifications with the following logic:
 

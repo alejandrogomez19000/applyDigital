@@ -1,12 +1,13 @@
+import { getNotificationPermissionStatus } from "@/api/nofiticationPermission";
 import { Header } from "@/components/Header";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { AppNotificationStatuses, MOBILE_KEYWORDS_FILTERS } from "@/constants/global";
+import { AppNotificationStatuses, MOBILE_KEYWORDS_FILTERS, StorageKeys } from "@/constants/global";
 import { useNotificationSettings } from "@/hooks/useNotificationSettings";
 import { useNotificationStore } from "@/store/notificationStore";
-import CheckBox from "@react-native-community/checkbox";
-import { useMemo } from "react";
-import { ActivityIndicator, StyleSheet, Switch } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useMemo } from "react";
+import { ActivityIndicator, AppState, AppStateStatus, StyleSheet, Switch } from "react-native";
 
 export default function SettingsScreen() {
   const {
@@ -17,6 +18,7 @@ export default function SettingsScreen() {
     askPermission,
     openSystemSettings,
     handleSetNotificationFilters,
+    setOsStatus,
   } = useNotificationSettings();
 
   const { filters } = useNotificationStore();
@@ -25,8 +27,7 @@ export default function SettingsScreen() {
     return Object.values(MOBILE_KEYWORDS_FILTERS).map((keyword) => (
       <ThemedView style={styles.buttonContainer} key={keyword}>
         <ThemedText style={styles.text}>{keyword}</ThemedText>
-        <CheckBox
-          disabled={false}
+        <Switch
           value={filters.some((el) => el === keyword)}
           onValueChange={(newValue) => {
             const newFilters = newValue
@@ -40,6 +41,30 @@ export default function SettingsScreen() {
   }, [handleSetNotificationFilters, filters]);
 
   const osGranted = osStatus === AppNotificationStatuses.GRANTED;
+
+  useEffect(() => {
+    const handleAppStateChange = (nextState: AppStateStatus) => {
+      if (nextState === "active") {
+        (async () => {
+          const status = await getNotificationPermissionStatus();
+          setOsStatus(status);
+
+          if (status !== AppNotificationStatuses.GRANTED) {
+            setAppEnabled(false);
+            await AsyncStorage.setItem(StorageKeys.APP_NOTIFICATIONS_ENABLED, "false");
+          } else {
+            setAppEnabled(true);
+          }
+        })();
+      }
+    };
+
+    const subscription = AppState.addEventListener("change", handleAppStateChange);
+
+    return () => {
+      subscription.remove();
+    };
+  }, [setAppEnabled, setOsStatus]);
 
   if (loading) {
     return (
