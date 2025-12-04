@@ -1,8 +1,10 @@
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
 import { AppNotificationStatuses, MOBILE_KEYWORDS_FILTERS } from "@/constants/global";
 import { useNotificationSettings } from "@/hooks/useNotificationSettings";
 import CheckBox from "@react-native-community/checkbox";
 import React, { useMemo } from "react";
-import { ActivityIndicator, StyleSheet, Switch, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Switch } from "react-native";
 
 export default function SettingsScreen() {
   const {
@@ -18,8 +20,8 @@ export default function SettingsScreen() {
 
   const renderMobileFilters = useMemo(() => {
     return Object.values(MOBILE_KEYWORDS_FILTERS).map((keyword) => (
-      <View style={styles.buttonContainer} key={keyword}>
-        <Text style={styles.text}>{keyword}</Text>
+      <ThemedView style={styles.buttonContainer} key={keyword}>
+        <ThemedText style={styles.text}>{keyword}</ThemedText>
         <CheckBox
           disabled={false}
           value={notificationFilters.some((el) => el === keyword)}
@@ -30,10 +32,10 @@ export default function SettingsScreen() {
             handleSetNotificationFilters(newFilters);
           }}
         />
-      </View>
+      </ThemedView>
     ));
   }, [handleSetNotificationFilters, notificationFilters]);
-  console.log(notificationFilters, "notification filters all time");
+
   const osGranted = osStatus === AppNotificationStatuses.GRANTED;
 
   if (loading) {
@@ -44,11 +46,12 @@ export default function SettingsScreen() {
       />
     );
   }
+
   return (
-    <View style={{ padding: 16, gap: 16 }}>
-      <Text style={styles.subtitle}>Permission</Text>
-      <View style={styles.buttonContainer}>
-        <Text>Enable notifications in this app</Text>
+    <ThemedView style={{ padding: 16, gap: 16 }}>
+      <ThemedText style={styles.subtitle}>Permission</ThemedText>
+      <ThemedView style={styles.buttonContainer}>
+        <ThemedText>Enable notifications in this app</ThemedText>
         <Switch
           value={appEnabled}
           onValueChange={async (value) => {
@@ -64,12 +67,12 @@ export default function SettingsScreen() {
             await setAppEnabled(value);
           }}
         />
-      </View>
-      <View>
-        <Text style={styles.subtitle}>Notifications Preferences</Text>
+      </ThemedView>
+      <ThemedView>
+        <ThemedText style={styles.subtitle}>Notifications Preferences</ThemedText>
         {renderMobileFilters}
-      </View>
-    </View>
+      </ThemedView>
+    </ThemedView>
   );
 }
 
