@@ -1,11 +1,10 @@
 import { Card } from "@/components/Card";
-import { ThemedText } from "@/components/ThemedText";
+import { Header } from "@/components/Header";
 import { ThemedView } from "@/components/ThemedView";
 import { IArticle } from "@/interfaces/global";
 import { useArticleStore } from "@/store/articleStore";
 import { clearCachedFavouriteArticles, removeCachedFavouriteById } from "@/utils/offlineHelper";
-import React from "react";
-import { FlatList, Pressable, StyleSheet } from "react-native";
+import { Alert, FlatList, StyleSheet } from "react-native";
 
 export default function FavouritesArticlesScreen() {
   const { favouriteArticles, clearFavouriteArticles, setFavouriteArticles } = useArticleStore();
@@ -19,8 +18,28 @@ export default function FavouritesArticlesScreen() {
   };
 
   const handleRestoreAll = () => {
-    clearFavouriteArticles();
-    clearCachedFavouriteArticles();
+    if (favouriteArticles.length > 0) {
+      Alert.alert(
+        "Do you want to unselect all favourite articles?",
+        "Are you sure you want to unselect all favourite articles?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+            onPress: () => {},
+          },
+          {
+            text: "Add",
+            style: "destructive",
+            onPress: () => {
+              clearFavouriteArticles();
+              clearCachedFavouriteArticles();
+            },
+          },
+        ],
+        { cancelable: true }
+      );
+    }
   };
 
   const renderItems = ({ item }: { item: IArticle }) => (
@@ -34,12 +53,11 @@ export default function FavouritesArticlesScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedView style={styles.header}>
-        <ThemedText style={styles.text}>Remove all favourites</ThemedText>
-        <Pressable onPress={handleRestoreAll}>
-          <ThemedText style={styles.text}>Remove All</ThemedText>
-        </Pressable>
-      </ThemedView>
+      <Header
+        title="Favourite Articles"
+        actionCallback={handleRestoreAll}
+        actionIconName="trash.fill"
+      />
       <FlatList
         style={{ padding: 16 }}
         data={favouriteArticles}

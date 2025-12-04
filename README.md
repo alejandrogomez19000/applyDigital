@@ -1,4 +1,4 @@
-# applyDigital
+# ApplyDigital Challenge
 
 A React Native / Expo project that fetches mobile-related Hacker News stories, sends local notifications for relevant topics (Android/iOS), and caches favourites and deleted articles locally using AsyncStorage.
 
@@ -27,7 +27,7 @@ A React Native / Expo project that fetches mobile-related Hacker News stories, s
 
 ## 🔎 About This Project
 
-`applyDigital` is an Expo/React-Native mobile app that:
+`ApplyDigital Challenge` is an Expo/React-Native mobile app that:
 
 - Fetches the latest **mobile-tagged** Hacker News articles via the HN Algolia API  
 - Monitors for new Android/iOS-related articles while the app is open  
@@ -62,6 +62,7 @@ Install the following:
   ```bash
   npm install -g expo-cli
 
+---
 
 ## 🚀 Getting Started
 
@@ -77,6 +78,7 @@ npm install
 # or
 yarn install
 ```
+---
 
 ## 📱 Running the App
 
@@ -113,6 +115,7 @@ npm run ios
 # or
 npx expo run:ios
 ```
+---
 
 ## 🔔 Notifications
 
@@ -139,6 +142,8 @@ npx expo run:ios
 * Notification filters
 
 Everything persists automatically via AsyncStorage.
+
+---
 
 ## 🧪 Testing
 
@@ -168,6 +173,8 @@ npm test -- --watch
 npx jest hooks/__tests__/useArticlesPolling.test.ts
 ```
 
+---
+
 ## 📁 Project Structure
 
 ```txt
@@ -182,6 +189,8 @@ applyDigital/
 ├── __tests__/         # Jest test files
 └── package.json
 ```
+
+---
 
 ## 🛠 Scripts
 

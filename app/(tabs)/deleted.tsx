@@ -1,5 +1,5 @@
 import { Card } from "@/components/Card";
-import { ThemedText } from "@/components/ThemedText";
+import { Header } from "@/components/Header";
 import { ThemedView } from "@/components/ThemedView";
 import { IArticle } from "@/interfaces/global";
 import { useArticleStore } from "@/store/articleStore";
@@ -8,8 +8,7 @@ import {
   removeCachedDeletedById,
   updateCachedArticles,
 } from "@/utils/offlineHelper";
-import React from "react";
-import { FlatList, Pressable, StyleSheet } from "react-native";
+import { Alert, FlatList, StyleSheet } from "react-native";
 
 export default function DeletedArticlesScreen() {
   const { articles, deletedArticles, clearDeletedArticles, setArticles, setDeletedArticles } =
@@ -27,11 +26,31 @@ export default function DeletedArticlesScreen() {
   };
 
   const handleRestoreAll = () => {
-    const updatedArticles = [...deletedArticles, ...articles];
-    setArticles(updatedArticles);
-    clearCachedDeletedArticles();
-    clearDeletedArticles();
-    updateCachedArticles(updatedArticles);
+    if (deletedArticles.length > 0) {
+      Alert.alert(
+        "Do you want to restore all deleted articles?",
+        "Are you sure you want to restore all deleted articles?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+            onPress: () => {},
+          },
+          {
+            text: "Add",
+            style: "destructive",
+            onPress: () => {
+              const updatedArticles = [...deletedArticles, ...articles];
+              setArticles(updatedArticles);
+              clearCachedDeletedArticles();
+              clearDeletedArticles();
+              updateCachedArticles(updatedArticles);
+            },
+          },
+        ],
+        { cancelable: true }
+      );
+    }
   };
 
   const renderItems = ({ item }: { item: IArticle }) => (
@@ -45,12 +64,11 @@ export default function DeletedArticlesScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedView style={styles.header}>
-        <ThemedText style={styles.text}>Restore Deleted Articles</ThemedText>
-        <Pressable onPress={handleRestoreAll}>
-          <ThemedText style={styles.text}>Restore All</ThemedText>
-        </Pressable>
-      </ThemedView>
+      <Header
+        title="Deleted Articles"
+        actionCallback={handleRestoreAll}
+        actionIconName="trash.fill"
+      />
       <FlatList
         style={{ padding: 16 }}
         data={deletedArticles}

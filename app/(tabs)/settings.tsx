@@ -1,3 +1,4 @@
+import { Header } from "@/components/Header";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { AppNotificationStatuses, MOBILE_KEYWORDS_FILTERS } from "@/constants/global";
@@ -50,29 +51,31 @@ export default function SettingsScreen() {
   }
 
   return (
-    <ThemedView style={{ padding: 16, gap: 16, flex: 1 }}>
-      <ThemedText style={styles.subtitle}>Permission</ThemedText>
-      <ThemedView style={styles.buttonContainer}>
-        <ThemedText>Enable notifications in this app</ThemedText>
-        <Switch
-          value={appEnabled}
-          onValueChange={async (value) => {
-            if (value && !osGranted) {
-              const status = await askPermission();
-              if (status !== AppNotificationStatuses.GRANTED) {
+    <ThemedView style={{ flex: 1 }}>
+      <Header title="Settings" />
+      <ThemedView style={{ padding: 16 }}>
+        <ThemedView style={styles.buttonContainer}>
+          <ThemedText>Enable notifications in this app</ThemedText>
+          <Switch
+            value={appEnabled}
+            onValueChange={async (value) => {
+              if (value && !osGranted) {
+                const status = await askPermission();
+                if (status !== AppNotificationStatuses.GRANTED) {
+                  openSystemSettings();
+                  return;
+                }
+              } else {
                 openSystemSettings();
-                return;
               }
-            } else {
-              openSystemSettings();
-            }
-            await setAppEnabled(value);
-          }}
-        />
-      </ThemedView>
-      <ThemedView>
-        <ThemedText style={styles.subtitle}>Notifications Preferences</ThemedText>
-        {renderMobileFilters}
+              await setAppEnabled(value);
+            }}
+          />
+        </ThemedView>
+        <ThemedView>
+          <ThemedText style={styles.subtitle}>Notifications Preferences</ThemedText>
+          {renderMobileFilters}
+        </ThemedView>
       </ThemedView>
     </ThemedView>
   );
@@ -86,7 +89,9 @@ const styles = StyleSheet.create({
     height: 50,
   },
   subtitle: {
-    fontSize: 20,
+    marginTop: 24,
+    marginBottom: 12,
+    fontSize: 18,
     fontWeight: "bold",
   },
   textInput: {

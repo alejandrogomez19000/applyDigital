@@ -32,7 +32,7 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Header title="Articles" />
+      <Header title="Latest Articles" />
       <FlatList
         style={{ padding: 16, flex: 1 }}
         data={articles}

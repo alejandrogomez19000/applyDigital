@@ -33,7 +33,6 @@ const MAX_SWIPE = 160;
 export function Card({
   article,
   onDelete,
-  disableDelete,
   onToggleFavourite,
   isFromDeleted,
   isFromFavourite,
@@ -110,6 +109,8 @@ export function Card({
   };
 
   const gesture = Gesture.Pan()
+    .activeOffsetX([-20, 20])
+    .failOffsetY([-10, 10])
     .onUpdate((e) => {
       let nextX = e.translationX;
       if (nextX > MAX_SWIPE) nextX = MAX_SWIPE;

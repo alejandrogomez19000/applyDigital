@@ -17,6 +17,7 @@ export const useArticlesPolling = () => {
   const meetsFilters = useCallback(
     (article: IArticle) => {
       const text = `${article.title} ${article.story_url ?? ""}`.toLowerCase();
+      if (filters.length < 1) return true;
       return filters.some((key) => text.includes(key));
     },
     [filters]
@@ -35,6 +36,7 @@ export const useArticlesPolling = () => {
         if (!data) return;
 
         const hits: IArticle[] = data.hits ?? [];
+
         if (hits.length === 0) return;
 
         const newestTimestamp = hits[0].created_at;
@@ -54,8 +56,7 @@ export const useArticlesPolling = () => {
 
           for (const article of newArticles) {
             await showNewArticleNotification({
-              title:
-                article.title || article.story_title || "New HN mobile article",
+              title: article.title || article.story_title || "New HN mobile article",
               url: article.story_url ?? undefined,
               body: `By ${article.author}`,
             });
