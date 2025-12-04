@@ -147,8 +147,12 @@ Everything persists automatically via AsyncStorage.
 
 ## ⭐ Features
 
+### Remove from the list or add to favourites
 
 ![ScreenRecording2025-12-04at1 19 04PM-ezgif com-optimize](https://github.com/user-attachments/assets/4fc45b17-10c6-480e-80b4-a4deefdcef79)
+
+### Notifications and articles view
+
 ![ScreenRecording2025-12-04at1 19 04PM-ezgif com-optimize (1)](https://github.com/user-attachments/assets/f2fc41a0-88b6-4c06-9904-db52faeb7d30)
 
 ---
