@@ -72,10 +72,11 @@ cd applyDigital
 
 - Install Dependencies
 
+```
 npm install
 # or
 yarn install
-
+```
 
 ## 📱 Running the App
 
@@ -83,12 +84,13 @@ yarn install
 
 - Start the development server:
 
+```
 npm start
 # or
 npx expo start
 # or
 yarn start
-
+```
 
 This opens Expo Dev Tools.
 
@@ -98,15 +100,19 @@ Scan the QR code using Expo Go on your device, or follow the options below.
 
 ### Running on Android
 
+```
 npm run android
 # or
 npx expo run:android
+```
 
 ### Running on iOS (macOS only)
 
+```
 npm run ios
 # or
 npx expo run:ios
+```
 
 ## 🔔 Notifications
 
@@ -146,28 +152,36 @@ Everything persists automatically via AsyncStorage.
 
 ### Run all tests
 
+```
 npm test
+```
 
 ### Run tests in watch mode
 
+```
 npm test -- --watch
+```
 
 ### Run a single test file
 
+```
 npx jest hooks/__tests__/useArticlesPolling.test.ts
+```
 
 ## 📁 Project Structure
 
 applyDigital/
-├─ api/                    # Axios instance, notification permission helpers
-├─ app/                    # expo-router screens
-├─ hooks/                  # custom hooks (polling, navigation, settings)
-├─ interfaces/             # TypeScript interfaces (Article, etc.)
-├─ store/                  # Zustand stores (articles, notifications)
-├─ utils/                  # helpers (offline cache, time formatting, indexing)
-├─ constants/              # strings, storage keys, enums
-├─ __tests__/              # Jest test files
-└─ package.json
+├── api/               # Axios instance, notification permission helpers
+├── app/               # expo-router screens and routes
+├── hooks/             # custom hooks (polling, navigation, settings)
+├── interfaces/        # TypeScript interfaces (Article, etc.)
+├── store/             # Zustand stores (articles, notifications, filters)
+├── utils/             # helpers (offline cache, time formatting, indexing)
+├── constants/         # storage keys, enums, config constants
+├── __tests__/         # Jest test files
+├── App.tsx            # main Expo entry point
+└── package.json
+
 
 ## 🛠 Scripts
 
