@@ -37,7 +37,7 @@ export default function DeletedArticlesScreen() {
             onPress: () => {},
           },
           {
-            text: "Add",
+            text: "Restore All",
             style: "destructive",
             onPress: () => {
               const updatedArticles = [...deletedArticles, ...articles];

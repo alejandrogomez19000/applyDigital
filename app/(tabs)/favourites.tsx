@@ -29,7 +29,7 @@ export default function FavouritesArticlesScreen() {
             onPress: () => {},
           },
           {
-            text: "Add",
+            text: "Remove All",
             style: "destructive",
             onPress: () => {
               clearFavouriteArticles();
